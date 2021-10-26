@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import { getDeviceDescription, getDeviceID } from "../util/device";
 import { default as NodeRSAType } from "node-rsa";
 
@@ -113,23 +114,25 @@ export default class ValSocket {
 
     // node-rsa is particularly big and we only need it here, so extract it into its own chunk
     // however, do prefetch it so that it'll be available as quickly as possible
-        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-        const NodeRSA: typeof NodeRSAType = <any>await import(/* webpackPrefetch: true */ /* webpackChunkName: "node-rsa" */ "node-rsa").then(x => x.default);
+      
+        const NodeRSA: typeof NodeRSAType =  await import(/* webpackPrefetch: true */ /* webpackChunkName: "node-rsa" */ "node-rsa").then(x => x.default);
         const rsa = new NodeRSA();
         rsa.importKey(pubkey,"pkcs8-public-pem" )
 
         // Create our identification payload with the chosen secret and info on the device.
         const { device, browser } = getDeviceDescription();
+        const buff = Buffer;
         const identify = JSON.stringify({
             secret: bufferToBase64(secret.buffer),
             identity: getDeviceID(),
             device, browser
         });
+       
 
         //Envia o handshake para o COnduit
         this.socket.send(JSON.stringify([
             ValOpcode.SEND,
-            //[MobileOpcode.SECRET, rsa.encrypt(identify, "base64", "utf8")]
+            [MobileOpcode.SECRET, rsa.encrypt(buff.from(identify, "utf8"), "base64", "utf8")]
         ]));
     
     }

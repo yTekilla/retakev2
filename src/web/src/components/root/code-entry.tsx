@@ -54,7 +54,7 @@ export class CodeEntry extends React.Component<value>{
     
      
     }
-   // const total = Object.keys(this).map(x => ( x as any).value).join("");
+    //const total = Object.keys(this).map(x => ( x as any).value).join("");
     //this.emiter.emit("input",total);
 
   }
